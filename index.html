@@ -56,6 +56,48 @@
     <br>
     <h2>Experiments</h2>
     <br>
+    <h4>RandAugment and refinement</h4>
+    <br>
+    <br>
+    The main experiment in this research involved a few different steps. First, each relevant model was trained according to its relevant protocol in its publication. Accuracy and loss were noted on both CIFAR-10 and CIFAR-10.1 test sets. Each model type was then retrained independently on 3 different RandAugment datasets with varying hyperparameters, and these were then scored on CIFAR-10 and CIFAR-10.1 test sets. Hyperparameter setups for RandAugment datasets can be seen in <i>Table 1.</i>
+    <br>
+    <br>
+      <table class = "tg">
+<thead>
+  <tr>
+    <th class="tg-0lax">Experiment setup</th>
+    <th class="tg-0lax">N (number of tranformations)</th>
+    <th class="tg-0lax">M (Magnitude of Transformations)</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td class="tg-0lax">Original</td>
+    <td class="tg-0lax">0</td>
+    <td class="tg-0lax">0</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">A</td>
+    <td class="tg-0lax">2</td>
+    <td class="tg-0lax">5</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">B</td>
+    <td class="tg-0lax">2</td>
+    <td class="tg-0lax">20</td>
+  </tr>
+  <tr>
+    <td class="tg-0lax">C</td>
+    <td class="tg-0lax">3</td>
+    <td class="tg-0lax">20</td>
+  </tr>
+</tbody>
+</table>
+    <div class="image-caption">
+      <strong>Table 1.</strong> Table of RandAugment dataset configurations
+    </div>
+    <br>
+    <br>
     <div class="image">
       <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/resnet_ra_probabilities.JPG">
     </div>
