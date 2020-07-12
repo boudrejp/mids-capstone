@@ -59,7 +59,7 @@
     <h4>RandAugment and refinement</h4>
     <br>
     <br>
-    The main experiment in this research involved a few different steps. First, each relevant model was trained according to its relevant protocol in its publication. Accuracy and loss were noted on both CIFAR-10 and CIFAR-10.1 test sets. Each model type was then retrained independently on 3 different RandAugment datasets with varying hyperparameters, and these were then scored on CIFAR-10 and CIFAR-10.1 test sets. Hyperparameter setups for RandAugment datasets can be seen in <i>Table 1.</i>
+    The main experiments in this research involved a few different steps. First, each relevant model was trained according to its relevant protocol in its publication. Accuracy and loss were noted on both CIFAR-10 and CIFAR-10.1 test sets. Each model type was then retrained independently on 3 different RandAugment datasets with varying hyperparameters, and these were then scored on CIFAR-10 and CIFAR-10.1 test sets. Hyperparameter setups for RandAugment datasets can be seen in <i>Table 1.</i> An additional graphical summary is given by <i>Figure 3.</i>
     <br>
     <br>
       <table class = "tg">
@@ -99,30 +99,103 @@
     <br>
     <br>
     <div class="image">
-      <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/resnet_ra_probabilities.JPG">
+      <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/experiment_setup.JPG">
     </div>
     <div class="image-caption">
-      <strong>Figure X.</strong> What happens when we do a ton of augmentation to resnet
+      <strong>Figure 3.</strong> Graphical representation of experiments
     </div>
-
+    <br>
+    <br>
+    An additional line of experimentation was conducted using CutMix as an augmentation method, following a similar protocol to the RandAugment experiments.
+    <br>
+    <br>
+    The last line of experimentation utilized the same models trained on the RandAugment datasets, but also used RandAugment to transform the test sets. Although one might not have control over the images to score in a real world scenario, a product could transform images before scoring them in order to take out any features that might throw off the algorithm. This experiment is meant to test the performance of such a setup.
+    <br>
     <br>
     <h2>Results</h2>
     <br>
     <br>
+    Results for the main line of experimentation show evidence that augmentation is not an effective way to lessen the distribution gap. <i>Figure 4</i> shows a summary of the relevant results. Despite trying out many different models and random augment configurations, we do not appear the make the distribution gap between CIFAR-10 and CIFAR-10.1 .
+    <br>
+    <div class="image">
+      <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/summary_results.JPG">
+    </div>
+    <div class="image-caption">
+      <strong>Figure 4.</strong> Summary of experiment results. Note the vertical gap between CIFAR-10 and CIFAR-10.1 performance; this represents the distribution gap.
+    </div>
     <h2>Analysis</h2>
     <br>
-    <h4>Subheading 1</h4>
+    <h4>Random variations in test sets</h4>
+    <br>
+    Given that CIFAR-10 and CIFAR-10.1 are generated from the same corpus of data and follow the same protocol, it could be possible that the distribution gap between these two could be explained by random sampling error. We test this hypothesis by taking several bootstrapped samples of the CIFAR-10 test set (n=10,000) to the same size of the CIFAR-10.1 test set (n=2,000). If the performance gap observed between these two test sets was from sampling error, we would see that the performance on the bootstrapped samples should not be different with statistical significance. Performing this test with just the wide residual net model (wrn) was enough to provide evidence that this does not appear to be the case. <i>Figure 5</i> shows the results from this analysis, with the red line marking the accuracy on CIFAR-10.1 test set and the blue bars representing the distribution of accuracy on bootstrapped test sets.
+
+    <br>
+    <div class="image">
+      <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/wrn_accuracy_sample.JPG">
+    </div>
+    <div class="image-caption">
+      <strong>Figure 5.</strong> Bootstrapped test sets from CIFAR-10 do not approach CIFAR-10.1, confirming the presence of a distribution gap as opposed to random sampling error.
+    </div>
     <br>
     <br>
-    <h4>Subheading 2</h4>
+    <h4>Alternative allocations of augmented training and refinement</h4>
+    <br>
+    <br>
+    While the main experiment results summarized in <i>Figure 4</i> show that augmentation was not effective, this was primarily tested using 400 epochs of augmented training and 50 epochs of refinement. Perhaps different levels of augmentation and refinement, while keeping the same number of overall training epochs the same, could result in more favorable results for the distribution gap. Training on resnet-32 was split between a number of epochs with a high learning rate with RandAugment data (n=2, m=20) and training on the original CIFAR-10 data, such that the total number of epochs of training was equal to 450. The models did not show any notable performance increase over the original CIFAR-10 distribution gap (p < 1e-18). <i>Figure 6</i> shows this result.
+    <br>
+    <div class="image">
+      <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/alternative_epochs.JPG">
+    </div>
+    <div class="image-caption">
+      <strong>Figure 6.</strong> Different levels of augmentation does not appear to significantly impact the distribution gap.
+    </div>
+    <br>
+    <br>
+    <h4>Image probabilities and misclassification across models</h4>
+    <br>
+    <br>
+    After training many different models with RandAugment protocol and not observing difference in the distribution gap, we moved to analyze how much differently the models were assigning class probabilities as a result of the augmentation. On an aggregate level, this can be seen by looking at the number of models that misclassify each image before and after augmentation. <i>Figure 7</i> shows the results of this analysis. Overall, augmentation reduced the number of images every individual model misclassified, but it also reduced the number of images that every model is able to correctly classify.
+    <br>
+    <div class="image">
+      <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/misclassified_agg_ra_0_0.JPG">
+      <br>
+      <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/misclassified_agg_ra_2_5.JPG">
+      <br>
+      <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/misclassified_agg_ra_2_20.JPG">
+      <br>
+      <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/misclassified_agg_ra_3_20.JPG">
+      <br>
+    </div>
+    <div class="image-caption">
+      <strong>Figure 7.</strong> Increasing augmentation changes the number of models able to correctly classify images
+    </div>
+    <br>
+    The same phenomena can be seen on an individual model level as well. When looking at assigned image probabilities, augmented models appear to be less certain in their assigned probabilities compared to the non-augmented counterparts. This applies to both correctly and incorrectly assigned labels. <i>Figure 8</i> summarizes this result.
+    <br>
+    <div class="image">
+      <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/resnet_ra_probabilities.JPG">
+    </div>
+    <div class="image-caption">
+      <strong>Figure 8.</strong> Models become more uncertain as they are trained on more heavily augmented data.
+    </div>
+
+
+
+    <br>
+    <br>
+    It is unclear if these results demonstrate that these models are now better generalized to perform on new data or just simply perform differently. Lower accuracy scores compared to the original publications on both CIFAR-10 and CIFAR-10.1 suggest that this approach simply makes models worse overall.
     <br>
     <br>
     <h2>Follow-up</h2>
     <br>
     <br>
+    There are a few different areas that the researchers propose as logical next steps to this analysis. Active learning using model trained on augmented data could provide a useful way to create a new, robust dataset that better spans the overall distribution of relevant images.
+    <br>
+    <br>
     <h2>Conclusions</h2>
     <br>
     <br>
+    Overall, it seems that data augmentation cannot effectively bridge the distribution gap seen in computer vision research. 
     <!--<h2>Thanks</h2> no spoilers! -->
     <br>
     <br>
