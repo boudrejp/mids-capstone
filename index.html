@@ -18,28 +18,36 @@
         <div class="card">
           <h2>Can we change existing data to generalize better to new data?</h2>
           <h5>August 4, 2020</h5>
-          <p>Image recognition research and training is often based on performance on a few different academic standard datasets like CIFAR-10 or ImageNet. While these give the advantage of being able to compare models to each other for performance metrics, training consistently on the same dataset introduces the question: "How much can we trust these classifiers in the real world?" There is even reason to believe that they might not even generalize to the data used to generate their training and evaluation datasets. Recent work from UC Berkeley (Recht et. al) generated a new dataset using identical protocol to that of CIFAR-10 and observed that classifiers performed notably worse on the newly created CIFAR-10.2 dataset. They attribute this difference to a distribution gap, meaning that images between datasets are inherently different in their distributions. A question of interest is how to train models to lessen this distribution gap and hopefully have better performance in real world applications.</p>
-          <p>Research from He et al. (2019) indicates that data augmentation can be a feasible regularization approach. The goal of doing this is to help models only focus on most important hallmark features of each class rather than idiosyncracies of the distribution of data available for training. While this work did show improved results for overall model accuracy, there was no attention to the distribution gap. This work continues on He et al., where we analyze this approach and its applicability in lessening the distribution gap.</p>
+          <p>
+            Image recognition research and training is often based on performance on a few different academic standard datasets like CIFAR-10 or ImageNet. While these give the advantage of being able to compare models to each other for performance metrics, training consistently on the same dataset introduces the question: "How much can we trust these classifiers in the real world?" There is even reason to believe that they might not even generalize to the data used to generate their training and evaluation datasets. Recent work from UC Berkeley (Recht et. al) generated a new dataset using identical protocol to that of CIFAR-10 and observed that classifiers performed notably worse on the newly created CIFAR-10.2 dataset. They attribute this difference to a distribution gap, meaning that images between datasets are inherently different in their distributions. A question of interest is how to train models to lessen this distribution gap and hopefully have better performance in real world applications.
+          </p>
+          <p>
+            Research from He et al. (2019) indicates that data augmentation can be a feasible regularization approach. The goal of doing this is to help models only focus on most important hallmark features of each class rather than idiosyncracies of the distribution of data available for training. While this work did show improved results for overall model accuracy, there was no attention to the distribution gap. Our experimentation continues on He et al., where we analyze this approach and its applicability in lessening the distribution gap.
+          </p>
           <br>
           <h3>Experiment setup and methods</h3>
           <br>
           <p>
-            The primary augmentation method utlizied to create new training datasets was RandAugment. This method takes two hyperparameters- <i>N</i>, the number of transformations to apply randomly, and <i>M</i>, the magnitude of the individual transformations. RandAugment randomly selects and applies transformations like blocking parts of the image, flipping, warping, and changing contrast. Some examples of original data and the augmented data created by RandAugment can be seen below for a few different hyperparameters.
+            The primary augmentation method utilized to create new training datasets was RandAugment. This method takes two hyperparameters- <i>N</i>, the number of transformations to apply randomly, and <i>M</i>, the magnitude of the individual transformations. RandAugment randomly selects and applies transformations like blocking parts of the image, flipping, warping, and changing contrast. Some examples of original data and the augmented data created by RandAugment can be seen below for a few different hyperparameters.
           </p>
           <div class="fakeimg">
             <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/augmentation_sample.JPG" width='800px'>
           </div>
           <br>
           <p>
-            Another augmentation method used was CutMix. CutMix samples images randomly from a dataset and will merge two images together. The resulting image has two different labels, each which relate to a different proportion of the image. An example CutMix application can be seen below.
+             Another augmentation method used was CutMix. CutMix samples images randomly from a dataset and will merge two images together. The resulting image has two different labels, each which relate to a different proportion of the image. An example CutMix application to CIFAR-10 data can be seen below. CutMix has a hyperparameter <i>alpha</i> that is used to manipulate the degree of the transformation.
           </p>
           <div class="fakeimg">
             <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/cutmix_example2.JPG" width='800px'>
           </div>
           <br>
           <p>
-                The main experiments in this research involved a few different steps. First, each relevant model was trained according to its relevant protocol in its publication. Accuracy and loss were noted on both CIFAR-10 and CIFAR-10.1 test sets. Each model type was then retrained independently on 3 different RandAugment datasets with varying hyperparameters, and these were then scored on CIFAR-10 and CIFAR-10.1 test sets. Hyperparameter setups for RandAugment datasets can be seen in <i>Table 1.</i> An additional graphical summary for the experiment setup is given below.
+                The main experiments in this research involved a few different steps. First, each relevant model (resnet, densenet, resnext, wide residual net) was trained according to its relevant protocol in its publication. Accuracy and loss were noted on both CIFAR-10 and CIFAR-10.1 test sets. This represented our baseline results.
           </p>
+          <p>
+            We then created separate, parallel training datasets that used RandAugment to transform the original CIFAR-10 images. For RandAugment, we created 3 separate training datasets with hyperparameters that can be seen in the table below. For CutMix experiments, we created 3 separate datasets with alpha levels of 0.25, 0.5, and 1.
+          </p>
+
           <br>
           <br>
             <table class = "tg">
@@ -74,19 +82,35 @@
       </tbody>
       </table>
       <br>
+      <p>
+        For each one of these datasets, we trained each model from scratch using only augmented data with a high learning rate (0.1) for 400 epochs, followed by a refinement training of 50 epochs on original CIFAR-10 data at a lower learning rate (0.001). Model accuracy was then assessed on both CIFAR-10 and CIFAR-10.1 test sets to determine any performance changes from the original publications. A graphical summary of the process can be seen below.
+      </p>
+      <br>
       <div class="fakeimg">
         <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/experiment_setup.JPG">
       </div>
       <h3>Results</h3>
       <br>
       <p>
-        Results for the main line of experimentation show evidence that augmentation is not an effective way to lessen the distribution gap. The figure below shows a summary of the relevant results. Despite trying out many different models and random augment configurations, we do not appear the make the distribution gap between CIFAR-10 and CIFAR-10.1 .
-      </p>
+        Results for data augmented with the RandAugment method can be seen below. Overall, we see that the accuracy drop from CIFAR-10 to CIFAR-10.1 remains relatively constant. Had the augmentation and modified training procedure shrunk the distribution gap, we would have seen the gap between these two results for models get smaller as more augmentation is used. We see that these results hold constant throughout the different models that were used as well.
       <div class="fakeimg">
         <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/summary_results.JPG">
       </div>
       <br>
-      For more detailed analysis of the results, please visit the links on the right, which include a detailed write-up, github repository, and slides.
+      <p>
+        We saw similar results when performing the same type of experiments with CutMix, where the results can be seen below for different alpha values of CutMix. It is interesting to note, however, that the refinement procedure has such a pronounced effect on the accuracy of these models.
+      </p>
+      <br>
+      <div class="fakeimg">
+        <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/cutmix_results.JPG">
+      </div>
+      <p>
+        We did further analysis in a variety of different areas, which can be seen in the detailed report (linked on right). Unfortunately, none of these gave any results different than what has already been shown above.
+      </p>
+      <br>
+      <p>
+        Overall, we have shown that augmentation does not appear to help in bridging the distribution gap. We think that further analysis into augmented model inference could provide insight into why exactly this is the case. Additionally, doing this data augmentation could be an interesting way for an active learning approach in creating training datasets that can help bridge the distribution gap.
+      </p>
         </div>
       </div>
       <div class="rightcolumn">
@@ -98,7 +122,51 @@
           <!--
           <div class="fakeimg" style="height:100px;">Image</div>
           -->
-          <p>Sarah Danzi, Jennifer Mahle, John Boudreaux</p>
+          <ul>
+            <li>Sarah Danzi<br>
+              <ul>
+                <!--
+                <li>
+                  <a href="https://github.com/boudrejp">Github</a>
+                </li>
+                <li>
+                  <a href="https://www.linkedin.com/in/boudreauxjohn/">Linkedin</a>
+                </li>
+              -->
+                <li>
+                  <a href="mailto:danzisar@berkeley.edu">Email</a>
+                </li>
+              </ul>
+            </li>
+            <li>Jennifer Mahle<br>
+              <ul>
+                <!--
+                <li>
+                  <a href="https://github.com/boudrejp">Github</a>
+                </li>
+                <li>
+                  <a href="https://www.linkedin.com/in/boudreauxjohn/">Linkedin</a>
+                </li>
+                <li>
+                  <a href="mailto:john.boudreaux.93@gmail.com">Email</a>
+                </li>
+              -->
+              </ul>
+            </li>
+            <li>John Boudreaux<br>
+              <ul>
+                <li>
+                  <a href="https://github.com/boudrejp">Github</a>
+                </li>
+                <li>
+                  <a href="https://www.linkedin.com/in/boudreauxjohn/">Linkedin</a>
+                </li>
+                <li>
+                  <a href="mailto:john.boudreaux.93@gmail.com">Email</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
 
         </div>
         <div class="card">
@@ -110,7 +178,7 @@
           </div>
             <div class="card">
               <h2>Github</h2>
-              <p>Github repository can be found <a href="#">here.</a></p>
+              <p>Github repository can be found <a href="https://github.com/danzisar/w210-capstone">here.</a></p>
             </div>
             <div class="card">
               <h2>Detailed Write-up</h2>
