@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="./css/styles.css" />
+    <title>Targeting the Distribution Gap using Augmentation
+</title>
+  </head>
+  <body>
+
+    <div class="header">
+      <h2>Targeting the Distribution Gap using Augmentation
+</h2>
+    </div>
+
+    <div class="row">
+      <div class="leftcolumn">
+        <div class="card">
+          <h2>Can we change existing data to generalize better to new data?</h2>
+          <h5>August 4, 2020</h5>
+          <p>Image recognition research and training is often based on performance on a few different academic standard datasets like CIFAR-10 or ImageNet. While these give the advantage of being able to compare models to each other for performance metrics, training consistently on the same dataset introduces the question: "How much can we trust these classifiers in the real world?" There is even reason to believe that they might not even generalize to the data used to generate their training and evaluation datasets. Recent work from UC Berkeley (Recht et. al) generated a new dataset using identical protocol to that of CIFAR-10 and observed that classifiers performed notably worse on the newly created CIFAR-10.2 dataset. They attribute this difference to a distribution gap, meaning that images between datasets are inherently different in their distributions. A question of interest is how to train models to lessen this distribution gap and hopefully have better performance in real world applications.</p>
+          <p>Research from He et al. (2019) indicates that data augmentation can be a feasible regularization approach. The goal of doing this is to help models only focus on most important hallmark features of each class rather than idiosyncracies of the distribution of data available for training. While this work did show improved results for overall model accuracy, there was no attention to the distribution gap. This work continues on He et al., where we analyze this approach and its applicability in lessening the distribution gap.</p>
+          <br>
+          <h3>Experiment setup and methods</h3>
+          <br>
+          <p>
+            The primary augmentation method utlizied to create new training datasets was RandAugment. This method takes two hyperparameters- <i>N</i>, the number of transformations to apply randomly, and <i>M</i>, the magnitude of the individual transformations. RandAugment randomly selects and applies transformations like blocking parts of the image, flipping, warping, and changing contrast. Some examples of original data and the augmented data created by RandAugment can be seen below for a few different hyperparameters.
+          </p>
+          <div class="fakeimg">
+            <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/augmentation_sample.JPG" width='800px'>
+          </div>
+          <br>
+          <p>
+            Another augmentation method used was CutMix. CutMix samples images randomly from a dataset and will merge two images together. The resulting image has two different labels, each which relate to a different proportion of the image. An example CutMix application can be seen below.
+          </p>
+          <div class="fakeimg">
+            <img src="https://raw.githubusercontent.com/boudrejp/mids-capstone/master/img/cutmix_example2.JPG" width='800px'>
+          </div>
+        </div>
+      </div>
+      <div class="rightcolumn">
+        <div class="card">
+          <div class="fakeimg" style="height:150px;">
+            <img src="https://github.com/boudrejp/mids-capstone/blob/master/img/berkeleyischool-logo-modified-blue-lg.png?raw=true" alt="">
+          </div>
+          <h2>Authors</h2>
+          <!--
+          <div class="fakeimg" style="height:100px;">Image</div>
+          -->
+          <p>Sarah Danzi, Jennifer Mahle, John Boudreaux</p>
+
+        </div>
+        <div class="card">
+          <h2>Further Information</h2>
+
+          <div class="card">
+            <h2>Slides</h2>
+            <p>Slides can be found <a href="#">here.</a></p>
+          </div>
+            <div class="card">
+              <h2>Github</h2>
+              <p>Github repository can be found <a href="#">here.</a></p>
+            </div>
+        </div>
+      </div>
+
+
+
+  </body>
+</html>
